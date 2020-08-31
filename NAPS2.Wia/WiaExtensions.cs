@@ -32,6 +32,12 @@ namespace NAPS2.Wia
             return (capabilities & WiaPropertyValue.FEEDER) != 0;
         }
 
+        public static bool SupportsFlatbed(this WiaDevice device)
+        {
+            int capabilities = (int)device.Properties[WiaPropertyId.DPS_DOCUMENT_HANDLING_CAPABILITIES].Value;
+            return (capabilities & WiaPropertyValue.FLATBED) != 0;
+        }
+
         public static bool SupportsDuplex(this WiaDevice device)
         {
             int capabilities = (int)device.Properties[WiaPropertyId.DPS_DOCUMENT_HANDLING_CAPABILITIES].Value;
