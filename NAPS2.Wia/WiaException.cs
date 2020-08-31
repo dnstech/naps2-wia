@@ -31,9 +31,9 @@ namespace NAPS2.Wia
             switch (errorCode)
             {
                 case WiaErrorCodes.PAPER_EMPTY:
-                    return "Paper empty";
+                    return "There are no documents in the document feeder.";
                 case WiaErrorCodes.NO_DEVICE_AVAILABLE:
-                    return "No device available";
+                    return "No scanner device was found. Make sure the device is online, connected to the PC, and has the correct driver installed on the PC.";
                 case WiaErrorCodes.OFFLINE:
                     return "The device is offline";
                 case WiaErrorCodes.PAPER_JAM:
@@ -51,7 +51,11 @@ namespace NAPS2.Wia
                 case WiaErrorCodes.LAMP_OFF:
                     return "Lamp is off";
                 case WiaErrorCodes.WARMING_UP:
-                    return "Device is warming up";
+                    return "The device is warming up.";
+                case WiaErrorCodes.PAPER_PROBLEM:
+                    return "An unspecified problem occurred with the scanner's document feeder.";
+                case WiaErrorCodes.USER_INTERVENTION:
+                    return "There is a problem with the WIA device. Make sure that the device is turned on, online, and any cables are properly connected.";
             }
 
             return $"WIA error code {errorCode:X}";

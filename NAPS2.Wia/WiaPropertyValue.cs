@@ -1,4 +1,6 @@
-﻿namespace NAPS2.Wia
+﻿using System.Runtime.InteropServices;
+
+namespace NAPS2.Wia
 {
     /// <summary>
     /// Property value constants.

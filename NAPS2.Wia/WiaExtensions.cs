@@ -50,6 +50,60 @@ namespace NAPS2.Wia
             return (status & WiaPropertyValue.FEED_READY) != 0;
         }
 
+        /// <summary>
+        /// Enables scanning double sided pages, make sure you check device SupportsDuplex before calling this.
+        /// </summary>
+        /// <param name="item">The feeder sub item.</param>
+        public static void EnableDuplex(this WiaItem item)
+        {
+            item.SetProperty(WiaPropertyId.IPS_DOCUMENT_HANDLING_SELECT, WiaPropertyValue.DUPLEX);
+        }
+
+        public static void SetAutoDeskewEnabled(this WiaItem item, bool enabled)
+        {
+            item.SetProperty(WiaPropertyId.IPS_AUTO_DESKEW, enabled ? (int)WiaAutoDeskew.On : (int)WiaAutoDeskew.Off);
+        }
+
+        public static void SetAutoCrop(this WiaItem item, WiaAutoCrop autoCrop)
+        {
+            item.SetProperty(WiaPropertyId.IPS_AUTO_CROP, (int)autoCrop);
+        }
+
+        /// <summary>
+        /// Specifies the number of pages, zero will auto feed all pages from the feeder.
+        /// NOTE: To get both sides of a duplex scan for a single piece of paper you will have to set page count to 2.
+        /// </summary>
+        /// <param name="item">The wia sub item from the device.</param>
+        /// <param name="pageCount">0 or number of pages.</param>
+        public static void SetPageCount(this WiaItem item, int pageCount = 0) 
+        {
+            item.SetProperty(WiaPropertyId.IPS_PAGES, pageCount);
+        }
+
+        public static void SetPageSize(this WiaItem item, WiaPageSize pageSize)
+        {
+            item.SetProperty(WiaPropertyId.IPS_PAGE_SIZE, (int)pageSize);
+        }
+
+        ////public static void SetCustomPageSize(this WiaItem item, float widthInInches, float heightInInches)
+        ////{
+        ////    item.SetProperty(WiaPropertyId.IPS_PAGE_SIZE, (int)WiaPageSize.Custom);
+        ////    item.SetProperty(WiaPropertyId.IPS_XEXTENT, (int)(widthInInches * 1000));
+        ////    item.SetProperty(WiaPropertyId.IPS_YEXTENT, (int)(heightInInches * 1000));
+        ////}
+
+        public static void SetColour(this WiaItem item, WiaColour color)
+        {
+            item.SetProperty(WiaPropertyId.IPA_DATATYPE, (int)color);
+        }
+
+        public static int TrySetDpi(this WiaItem item, int dpi)
+        {
+            item.SetPropertyClosest(WiaPropertyId.IPS_XRES, ref dpi);
+            item.SetPropertyClosest(WiaPropertyId.IPS_YRES, ref dpi);
+            return dpi;
+        }
+
         public static void SetProperty(this WiaItemBase item, int propId, int value)
         {
             var prop = item.Properties.GetOrNull(propId);

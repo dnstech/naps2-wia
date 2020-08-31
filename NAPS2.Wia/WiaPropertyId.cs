@@ -49,5 +49,11 @@
         public const int IPS_MAX_VERTICAL_SIZE = 6166;
         public const int IPS_DOCUMENT_HANDLING_SELECT = 3088;
         public const int IPS_PAGES = 3096;
+
+        public const int IPS_PAGE_SIZE = 3097; // 0xc19
+
+        public const int IPS_AUTO_DESKEW = 3107; // 0xc23
+
+        public const int IPS_AUTO_CROP = 4170; // 0x104a
     }
 }

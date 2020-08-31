@@ -6,13 +6,24 @@
         xmlns:local="clr-namespace:NAPS2.Wia.WpfSample"
         mc:Ignorable="d"
         Title="WIA Sample" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <DockPanel>
-            <Button DockPanel.Dock="Bottom" Click="ScanClicked" VerticalAlignment="Center" HorizontalAlignment="Left" Padding="20,5" Margin="20">Scan</Button>
+            <StackPanel DockPanel.Dock="Bottom"  Orientation="Horizontal">
+                <Button Click="ScanClicked" VerticalAlignment="Center" HorizontalAlignment="Left" Padding="20,5" Margin="20">Scan</Button>
+                <ProgressBar 
+                         Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}" 
+                         Value="{Binding ScanProgress}" 
+                         VerticalAlignment="Center"
+                         Height="20"
+                         Width="180" />
+            </StackPanel>
             <ScrollViewer>
                 <ItemsControl ItemsSource="{Binding Pages}" Background="Gray">
                     <ItemsControl.ItemTemplate>

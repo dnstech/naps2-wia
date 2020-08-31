@@ -22,6 +22,7 @@ namespace NAPS2.Wia.WpfSample
         private WiaDeviceInfo currentDevice;
         private string currentPaperSource;
         private bool hasLoadedDevices = false;
+        private bool isScanning;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -78,6 +79,21 @@ namespace NAPS2.Wia.WpfSample
             }
         }
 
+        public bool IsScanning
+        {
+            get => this.isScanning;
+            set
+            {
+                if (this.isScanning != value)
+                {
+                    this.isScanning = value;
+                    this.RaisePropertyChanged();
+                }
+            }
+        }
+
+        public int ScanProgress { get; set; }
+
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
@@ -112,10 +128,8 @@ namespace NAPS2.Wia.WpfSample
                     {
                         try
                         {
-
                             using (device)
                             {
-
                                 var paperSources = new List<string>();
                                 using (var openDevice = deviceManager.FindDevice(device.Id()))
                                 {
@@ -173,44 +187,80 @@ namespace NAPS2.Wia.WpfSample
                         // Select between Flatbed/Feeder
                         using (var item = device.FindSubItem(subItem))
                         {
-
                             if (this.CurrentPaperSource == "FeederDuplex")
                             {
-                                // | WiaPropertyValue.FRONT_FIRST
                                 // Enable duplex scanning
-                                item.SetProperty(WiaPropertyId.IPS_DOCUMENT_HANDLING_SELECT, WiaPropertyValue.DUPLEX);
+                                item.EnableDuplex();
                             }
 
                             if (subItem == "Feeder")
                             {
                                 // Set WIA_IPS_PAGES to 0 to scan all pages.
-                                item.SetProperty(WiaPropertyId.IPS_PAGES, 0);
+                                item.SetPageCount(0);
                             }
+
+                            item.SetColour(WiaColour.Colour);
+                            var actualDpi = item.TrySetDpi(300);
+                            item.SetAutoCrop(WiaAutoCrop.Single);
+                            item.SetAutoDeskewEnabled(true);
+                            ////item.SetPageSize(WiaPageSize.A4);
+
+                            this.Log($"Scanning at {actualDpi}");
 
                             // Set up the scan
                             using (var transfer = item.StartTransfer())
                             {
-                                EventHandler<Wia.WiaTransfer.PageScannedEventArgs> handler = (s, args) =>
+                                try
                                 {
-                                    using (args.Stream)
-                                    {
-                                        var bitmap = new Bitmap(args.Stream);
-                                        this.AddPageFromBitmap(bitmap);
-                                    }
-                                };
-                                transfer.PageScanned += handler;
-                                // Do the actual scan
-                                transfer.Download();
-                                transfer.PageScanned -= handler;
+                                    transfer.PageScanned += this.WiaTransferPageScanned;
+                                    transfer.Progress += this.WiaTransferProgressChanged;
+                                    transfer.TransferComplete += this.WiaTransferComplete;
+
+                                    // Do the actual scan
+                                    transfer.Download();
+                                }
+                                finally
+                                {
+                                    transfer.PageScanned -= this.WiaTransferPageScanned;
+                                    transfer.Progress -= this.WiaTransferProgressChanged;
+                                    transfer.TransferComplete -= this.WiaTransferComplete;
+                                }
                             }
                         }
                     }
                 }
             }
+            catch (ArgumentException badProperty)
+            {
+                this.Log(badProperty.Message);
+            }
             catch (WiaException error)
             {
                 this.Log(error.Message);
             }
+        }
+
+        private void WiaTransferPageScanned(object sender, WiaTransfer.PageScannedEventArgs e)
+        {
+            using (e.Stream)
+            {
+                var bitmap = new Bitmap(e.Stream);
+                this.AddPageFromBitmap(bitmap);
+            }
+        }
+
+        private void WiaTransferProgressChanged(object sender, WiaTransfer.ProgressEventArgs e)
+        {
+            Dispatcher.BeginInvoke(
+                  new Action<int?>(this.SetProgress),
+                  (int?)e.Percent);
+        }
+
+        private void WiaTransferComplete(object sender, EventArgs e)
+        {
+            Dispatcher.BeginInvoke(
+                  new Action<int?>(this.SetProgress),
+                  (int?)null);
         }
 
         private void WiaAcquisitionCompleted(object sender, EventArgs e)
@@ -221,6 +271,19 @@ namespace NAPS2.Wia.WpfSample
         private void WiaItemAcquired(object sender, EventArgs e)
         {
             this.Log("WiaItemAcquired:" + e.ToString());
+        }
+
+        public void SetProgress(int? progress)
+        {
+            if (progress.HasValue)
+            {
+                this.IsScanning = true;
+                this.ScanProgress = progress.Value;
+            }
+            else
+            {
+                this.IsScanning = false;
+            }
         }
 
         public void Log(string message)
@@ -275,6 +338,7 @@ namespace NAPS2.Wia.WpfSample
                     this.Sources.Add(source);
                 }
             }
+
             public string Id { get; }
 
             public string Name { get; }
