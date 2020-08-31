@@ -19,6 +19,7 @@ namespace NAPS2.Wia.WpfSample
     {
         private string currentDevice;
         private string currentPaperSource;
+        private bool hasLoadedDevices = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -28,23 +29,27 @@ namespace NAPS2.Wia.WpfSample
             this.DataContext = this;
         }
 
+
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
-            this.Devices.Clear();
-
-            using (var deviceManager = new WiaDeviceManager())
+            if (!this.hasLoadedDevices)
             {
-                foreach (var device in deviceManager.GetDeviceInfos())
+                this.hasLoadedDevices = true;
+                this.Devices.Clear();
+                using (var deviceManager = new WiaDeviceManager())
                 {
-                    using (device)
+                    foreach (var device in deviceManager.GetDeviceInfos())
                     {
-                        this.Devices.Add(device.Id());
+                        using (device)
+                        {
+                            this.Devices.Add(device.Id());
+                        }
                     }
                 }
-            }
 
-            this.CurrentDevice = this.Devices.FirstOrDefault();
+                this.CurrentDevice = this.Devices.FirstOrDefault();
+            }
         }
 
         public ObservableCollection<string> Devices { get; } = new ObservableCollection<string>();
@@ -109,50 +114,48 @@ namespace NAPS2.Wia.WpfSample
         {
             this.Pages.Clear();
             this.Log("Starting WIA Scan");
-            Task.Run(() =>
+            try
             {
-                try
+                using (var deviceManager = new WiaDeviceManager(WiaVersion.Wia20))
                 {
-                    using (var deviceManager = new WiaDeviceManager())
+                    using (var device = deviceManager.FindDevice(this.CurrentDevice))
                     {
-                        using (var device = deviceManager.FindDevice(this.CurrentDevice))
-                        {
-                            var subItem = this.CurrentPaperSource == "Flatbed" ? "Flatbed" : "Feeder";
+                        var subItem = this.CurrentPaperSource == "Flatbed" ? "Flatbed" : "Feeder";
 
-                            // Select between Flatbed/Feeder
-                            using (var item = device.FindSubItem(subItem)) {
+                        // Select between Flatbed/Feeder
+                        using (var item = device.FindSubItem(subItem)) {
 
-                                if (this.CurrentPaperSource == "FeederDuplex")
+                            if (this.CurrentPaperSource == "FeederDuplex")
+                            {
+                                // | WiaPropertyValue.FRONT_FIRST
+                                // Enable duplex scanning
+                                item.SetProperty(WiaPropertyId.IPS_DOCUMENT_HANDLING_SELECT, WiaPropertyValue.DUPLEX);
+                            }
+
+                            // Set up the scan
+                            using (var transfer = item.StartTransfer())
+                            {
+                                EventHandler<Wia.WiaTransfer.PageScannedEventArgs> handler = (s, args) =>
                                 {
-                                    // Enable duplex scanning
-                                    item.SetProperty(WiaPropertyId.IPS_DOCUMENT_HANDLING_SELECT,
-                                                     WiaPropertyValue.DUPLEX | WiaPropertyValue.FRONT_FIRST);
-                                }
-
-                                // Set up the scan
-                                using (var transfer = item.StartTransfer())
-                                {
-                                    transfer.PageScanned += (s, args) =>
+                                    using (args.Stream)
                                     {
-                                        using (args.Stream)
-                                        {
-                                            var bitmap = new Bitmap(args.Stream);
-                                            this.AddPageFromBitmap(bitmap);
-                                        }
-                                    };
-
-                                    // Do the actual scan
-                                    transfer.Download();
-                                }
+                                        var bitmap = new Bitmap(args.Stream);
+                                        this.AddPageFromBitmap(bitmap);
+                                    }
+                                };
+                                transfer.PageScanned += handler;
+                                // Do the actual scan
+                                transfer.Download();
+                                transfer.PageScanned -= handler;
                             }
                         }
                     }
                 }
-                catch (Exception error)
-                {
-                    this.Log(error.Message);
-                }
-            });
+            }
+            catch (Exception error)
+            {
+                this.Log(error.Message);
+            }
         }
 
         private void WiaAcquisitionCompleted(object sender, EventArgs e)

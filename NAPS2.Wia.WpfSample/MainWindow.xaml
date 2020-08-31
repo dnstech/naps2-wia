@@ -24,11 +24,9 @@
             </ScrollViewer>
         </DockPanel>
         <DockPanel Grid.Column="1">
-            <ListBox DockPanel.Dock="Top" Grid.Column="1" ItemsSource="{Binding Devices}" SelectedItem="{Binding CurrentDevice, Mode=TwoWay}" 
-                     DisplayMemberPath="Name">
+            <ListBox DockPanel.Dock="Top" Grid.Column="1" ItemsSource="{Binding Devices}" SelectedItem="{Binding CurrentDevice, Mode=TwoWay}">
             </ListBox>
-            <ListBox DockPanel.Dock="Top" Grid.Column="1" ItemsSource="{Binding PaperSources}" SelectedItem="{Binding CurrentPaperSource, Mode=TwoWay}" 
-                     DisplayMemberPath="Name">
+            <ListBox DockPanel.Dock="Top" Grid.Column="1" ItemsSource="{Binding PaperSources}" SelectedItem="{Binding CurrentPaperSource, Mode=TwoWay}">
             </ListBox>
             <ItemsControl ItemsSource="{Binding Logs}"></ItemsControl>
         </DockPanel>
