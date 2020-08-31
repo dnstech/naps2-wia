@@ -17,18 +17,20 @@
                 <ItemsControl ItemsSource="{Binding Pages}" Background="Gray">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Image Source="{Binding}" MaxWidth="1920" />
+                            <Border Margin="20" MaxWidth="1920" BorderBrush="Black" BorderThickness="1">
+                                <Image Source="{Binding}" />
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
         </DockPanel>
         <DockPanel Grid.Column="1">
-            <ListBox DockPanel.Dock="Top" Grid.Column="1" ItemsSource="{Binding Devices}" SelectedItem="{Binding CurrentDevice, Mode=TwoWay}">
+            <ListBox DockPanel.Dock="Top" Grid.Column="1" ItemsSource="{Binding Devices}" SelectedItem="{Binding CurrentDevice, Mode=TwoWay}" DisplayMemberPath="Name">
             </ListBox>
             <ListBox DockPanel.Dock="Top" Grid.Column="1" ItemsSource="{Binding PaperSources}" SelectedItem="{Binding CurrentPaperSource, Mode=TwoWay}">
             </ListBox>
-            <ItemsControl ItemsSource="{Binding Logs}"></ItemsControl>
+            <ListBox ItemsSource="{Binding Logs}" ScrollViewer.HorizontalScrollBarVisibility="Auto"></ListBox>
         </DockPanel>
     </Grid>
 </Window>
