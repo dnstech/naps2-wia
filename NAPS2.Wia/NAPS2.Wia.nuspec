@@ -18,12 +18,11 @@ NOTE: This includes x86 and x64 compatible native dlls that are resolved at runt
       <group targetFramework=".NETCoreApp2.0" />
       <group targetFramework=".NETStandard2.0" />
     </dependencies>
-    <contentFiles>
-      <file src="bin\Release\**\_win32\NAPS2.Wia.Native.dll" target="content\_win32" />
-      <file src="bin\Release\**\_win64\NAPS2.Wia.Native.dll" target="content\_win64" />
-    </contentFiles>
   </metadata>
   <files>  
     <file src="bin\Release\**\*.dll" target="lib" exclude="bin\Release\**\NAPS2.Wia.Native.dll" />
+    <file src="_win32\NAPS2.Wia.Native.dll" target="build\_win32\" />
+    <file src="_win64\NAPS2.Wia.Native.dll" target="build\_win64\" />
+    <file src="Dnstech.NAPS2.Wia.props" target="build" />
   </files>
 </package>
