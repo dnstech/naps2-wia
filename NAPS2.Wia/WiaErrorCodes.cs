@@ -18,5 +18,7 @@
         public const uint INCORRECT_SETTING = 0x8021000C;
         public const uint LAMP_OFF = 0x80210017;
         public const uint WARMING_UP = 0x80210007;
+        public const uint USER_INTERVENTION = 0x80210008;
+        public const uint PAPER_PROBLEM = 0x80210004;
     }
 }
