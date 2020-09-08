@@ -104,11 +104,10 @@ namespace NAPS2.Wia.WpfSample
             }
         }
 
-        private void RefreshDevices()
+        private async void RefreshDevices()
         {
             this.Devices.Clear();
-
-            var devices = this.GetAllDevices();
+            var devices = await Task.Factory.StartNew(this.GetAllDevices, TaskCreationOptions.LongRunning);
             foreach (var device in devices)
             {
                 this.Devices.Add(device);
