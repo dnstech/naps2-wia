@@ -16,12 +16,33 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="_win32\NAPS2.Wia.Native.dll">
+      <None Remove="Dnstech.NAPS2.Wia.props" />
+      <None Remove="_win32\dbg\NAPS2.Wia.Native.dll" />
+      <None Remove="_win32\NAPS2.Wia.Native.dll" />
+      <None Remove="_win64\dbg\NAPS2.Wia.Native.dll" />
+      <None Remove="_win64\NAPS2.Wia.Native.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="_win32\NAPS2.Wia.Native.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="_win64\NAPS2.Wia.Native.dll">
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="_win32\dbg\NAPS2.Wia.Native.dll" />
+      <Content Include="_win64\dbg\NAPS2.Wia.Native.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      </Content>
+      <Content Include="_win64\NAPS2.Wia.Native.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Dnstech.NAPS2.Wia.props">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

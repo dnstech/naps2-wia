@@ -1,16 +1,17 @@
-<?xml version="1.0"?>
-<package >
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>NAPS2.Wia</id>
-    <version>1.0.0</version>
+    <id>Dnstech.NAPS2.Wia</id>
+    <version>1.0.3</version>
     <title>NAPS2.Wia</title>
-    <authors>Ben Olden-Cooligan</authors>
+    <authors>Ben Olden-Cooligan, DNS Technology Pty. Ltd.</authors>
     <owners>Ben Olden-Cooligan</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
-    <projectUrl>https://github.com/cyanfish/naps2-wia</projectUrl>
-    <description>Low-level WIA 2.0/1.0 application library for .NET</description>
+    <projectUrl>https://github.com/dnstech/naps2-wia</projectUrl>
+    <description>Low-level WIA 2.0/1.0 application library for .NET.
+NOTE: This includes x86 and x64 compatible native dlls that are resolved at runtime.</description>
     <copyright>Copyright 2018-2020 Ben Olden-Cooligan</copyright>
     <dependencies>
       <group targetFramework=".NETFramework4.0" />
@@ -18,7 +19,10 @@
       <group targetFramework=".NETStandard2.0" />
     </dependencies>
   </metadata>
-  <files>
-    <file src="bin\Release\**\*.dll" target="lib" />
+  <files>  
+    <file src="bin\Release\**\*.dll" target="lib" exclude="bin\Release\**\NAPS2.Wia.Native.dll" />
+    <file src="_win32\NAPS2.Wia.Native.dll" target="build\_win32\" />
+    <file src="_win64\NAPS2.Wia.Native.dll" target="build\_win64\" />
+    <file src="Dnstech.NAPS2.Wia.props" target="build" />
   </files>
 </package>
